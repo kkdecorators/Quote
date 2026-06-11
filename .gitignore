@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# build outputs
+dist/
+
+# caches
+.vite/
+*.log
+npm-debug.log*
+
+# editor
+.vscode/*
+!.vscode/extensions.json
