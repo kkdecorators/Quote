@@ -33,6 +33,8 @@ export default function App() {
 
   const [vars, setVars] = useState(loadVars);
   const [editVars, setEditVars] = useState(loadVars);
+  const [syncStatus, setSyncStatus] = useState("checking");
+  const [syncStatusMessage, setSyncStatusMessage] = useState("Checking cloud sync...");
 
   const [meters, setMeters] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -77,10 +79,23 @@ export default function App() {
         setVars(remoteVars);
         setEditVars(remoteVars);
         saveVars(remoteVars);
+        setSyncStatus("connected");
+        setSyncStatusMessage("Connected");
         return;
       }
 
-      await saveSyncedVars(vars);
+      const seedResult = await saveSyncedVars(vars);
+      if (cancelled) {
+        return;
+      }
+
+      if (seedResult.ok) {
+        setSyncStatus("connected");
+        setSyncStatusMessage("Connected");
+      } else {
+        setSyncStatus("local");
+        setSyncStatusMessage(getSyncErrorMessage(seedResult.code));
+      }
     }
 
     bootstrapVarsSync();
@@ -209,8 +224,12 @@ export default function App() {
 
     const syncResult = await saveSyncedVars(normalized);
     if (syncResult.ok) {
+      setSyncStatus("connected");
+      setSyncStatusMessage("Connected");
       window.alert("Variables updated successfully");
     } else {
+      setSyncStatus("local");
+      setSyncStatusMessage(getSyncErrorMessage(syncResult.code));
       window.alert(`Variables updated locally. ${getSyncErrorMessage(syncResult.code)}`);
     }
 
@@ -265,6 +284,8 @@ export default function App() {
               element={
                 <VarsSection
                   editVars={editVars}
+                  syncStatus={syncStatus}
+                  syncStatusMessage={syncStatusMessage}
                   onStepField={stepEditField}
                   onInputChange={updateEditField}
                   onSave={saveEditVars}
