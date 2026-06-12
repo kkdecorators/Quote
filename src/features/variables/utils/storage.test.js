@@ -30,7 +30,7 @@ describe("storage utils", () => {
     const loaded = loadVars();
 
     expect(loaded.A).toBe(5);
-    expect(loaded.B).toBe(0);
+    expect(loaded.B).toBe(2);
     expect(loaded.M).toBe(1.3);
   });
 
@@ -38,7 +38,7 @@ describe("storage utils", () => {
     localStorage.setItem("vars", "not-json");
     const loaded = loadVars();
 
-    expect(loaded.A).toBe(0);
-    expect(loaded.M).toBe(0);
+    expect(loaded.A).toBe(1);
+    expect(loaded.M).toBe(1.2);
   });
 });

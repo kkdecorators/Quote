@@ -11,6 +11,10 @@ import {
   AUTH_STORAGE_KEY,
   AUTH_USERNAME,
 } from "./features/variables/config/constants";
+import {
+  loadSyncedVars,
+  saveSyncedVars,
+} from "./features/variables/utils/firebaseSync";
 import { loadVars, saveVars } from "./features/variables/utils/storage";
 import { normalizeVars } from "./features/variables/utils/variables";
 
@@ -46,6 +50,32 @@ export default function App() {
       document.body.classList.remove("auth-locked");
     };
   }, [authenticated]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrapVarsSync() {
+      const remoteVars = await loadSyncedVars();
+      if (cancelled) {
+        return;
+      }
+
+      if (remoteVars) {
+        setVars(remoteVars);
+        setEditVars(remoteVars);
+        saveVars(remoteVars);
+        return;
+      }
+
+      await saveSyncedVars(vars);
+    }
+
+    bootstrapVarsSync();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleAuthSubmit(event) {
     event.preventDefault();
@@ -129,13 +159,20 @@ export default function App() {
     }));
   }
 
-  function saveEditVars(event) {
+  async function saveEditVars(event) {
     event.preventDefault();
     const normalized = normalizeVars(editVars);
     setVars(normalized);
     setEditVars(normalized);
     saveVars(normalized);
-    window.alert("Variables updated successfully");
+
+    const synced = await saveSyncedVars(normalized);
+    if (synced) {
+      window.alert("Variables updated successfully");
+    } else {
+      window.alert("Variables updated locally. Firebase sync is unavailable.");
+    }
+
     navigate("/");
   }
 

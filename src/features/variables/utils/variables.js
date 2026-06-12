@@ -1,10 +1,7 @@
-import { KEYS } from "../config/constants";
+import { DEFAULT_VARS, KEYS } from "../config/constants";
 
 export function createDefaultVars() {
-  return KEYS.reduce((acc, key) => {
-    acc[key] = 0;
-    return acc;
-  }, {});
+  return { ...DEFAULT_VARS };
 }
 
 export function normalizeVars(input) {

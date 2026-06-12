@@ -8,11 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist --add",
+    "deploy": "gh-pages -d dist",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "firebase": "^12.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.17.0"

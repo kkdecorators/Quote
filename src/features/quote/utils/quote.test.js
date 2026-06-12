@@ -29,11 +29,11 @@ describe("computeQuote", () => {
     expect(result.sellInc).toBeCloseTo(708.975);
   });
 
-  it("falls back missing vars to zero", () => {
+  it("falls back missing vars to canonical defaults", () => {
     const result = computeQuote(1, 1, { M: 2 });
 
-    expect(result.costEx).toBeCloseTo(0);
-    expect(result.sellEx).toBeCloseTo(0);
-    expect(result.sellInc).toBeCloseTo(0);
+    expect(result.costEx).toBeCloseTo(112);
+    expect(result.sellEx).toBeCloseTo(224);
+    expect(result.sellInc).toBeCloseTo(257.6);
   });
 });

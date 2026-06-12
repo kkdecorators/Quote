@@ -12,3 +12,8 @@ npm-debug.log*
 # editor
 .vscode/*
 !.vscode/extensions.json
+
+# env
+.env
+.env.local
+.env.*.local
