@@ -33,7 +33,4 @@ export const DEFAULT_VARS = {
   M: 1.2,
 };
 
-export const AUTH_STORAGE_KEY = "quote-app-authenticated";
-export const AUTH_USERNAME = "admin";
-export const AUTH_PASSWORD = "Quote@123";
 export const VARS_STORAGE_KEY = "vars";

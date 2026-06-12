@@ -225,6 +225,40 @@
   padding: 8px 10px;
 }
 
+.auth-info {
+  display: none;
+  margin: 6px 0 4px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.auth-link-btn {
+  border: none;
+  background: none;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  padding: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.auth-link-btn:hover {
+  color: var(--blue-dark);
+  text-decoration: underline;
+}
+
+.auth-link-btn:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
 .auth-submit {
   width: 100%;
   margin-top: 6px;

@@ -2,28 +2,35 @@ export default function AuthGate({
   authUsername,
   authPassword,
   authError,
+  authErrorMessage,
+  authInfoMessage,
+  authLoading,
+  authSubmitting,
+  authResetting,
   onUsernameChange,
   onPasswordChange,
   onSubmit,
+  onForgotPassword,
 }) {
   return (
     <div className="auth-gate" aria-live="polite">
       <div className="auth-card">
         <h1 className="auth-title">Sign In Required</h1>
         <p className="auth-subtitle">
-          Enter your username and password to access Quote App.
+          Sign in with your Firebase account to access Quote App.
         </p>
         <form className="auth-form" autoComplete="off" onSubmit={onSubmit}>
           <label className="auth-label" htmlFor="auth-username">
-            Username
+            Email
           </label>
           <input
             id="auth-username"
             className="auth-input"
-            type="text"
-            autoComplete="username"
+            type="email"
+            autoComplete="email"
             required
             value={authUsername}
+            disabled={authLoading || authSubmitting}
             onChange={onUsernameChange}
           />
           <label className="auth-label" htmlFor="auth-password">
@@ -36,6 +43,7 @@ export default function AuthGate({
             autoComplete="current-password"
             required
             value={authPassword}
+            disabled={authLoading || authSubmitting}
             onChange={onPasswordChange}
           />
           <div
@@ -43,10 +51,29 @@ export default function AuthGate({
             role="alert"
             style={{ display: authError ? "block" : "none" }}
           >
-            Invalid username or password
+            {authErrorMessage}
           </div>
-          <button type="submit" className="btn-primary auth-submit">
-            Log In
+          <div
+            className="auth-info"
+            role="status"
+            style={{ display: authInfoMessage ? "block" : "none" }}
+          >
+            {authInfoMessage}
+          </div>
+          <button
+            type="button"
+            className="auth-link-btn"
+            disabled={authLoading || authSubmitting || authResetting}
+            onClick={onForgotPassword}
+          >
+            {authResetting ? "Sending reset email..." : "Forgot password?"}
+          </button>
+          <button
+            type="submit"
+            className="btn-primary auth-submit"
+            disabled={authLoading || authSubmitting || authResetting}
+          >
+            {authSubmitting ? "Signing In..." : "Log In"}
           </button>
         </form>
       </div>

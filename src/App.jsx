@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import AuthGate from "./features/auth/components/AuthGate";
+import {
+  loginWithFirebase,
+  logoutFromFirebase,
+  sendResetEmail,
+  subscribeAuthState,
+} from "./features/auth/utils/firebaseAuth";
 import HomeSection from "./features/home/components/HomeSection";
 import Toolbar from "./features/layout/components/Toolbar";
 import QuoteSection from "./features/quote/components/QuoteSection";
 import { computeQuote } from "./features/quote/utils/quote";
 import VarsSection from "./features/variables/components/VarsSection";
-import {
-  AUTH_PASSWORD,
-  AUTH_STORAGE_KEY,
-  AUTH_USERNAME,
-} from "./features/variables/config/constants";
 import {
   loadSyncedVars,
   saveSyncedVars,
@@ -20,12 +21,15 @@ import { normalizeVars } from "./features/variables/utils/variables";
 
 export default function App() {
   const navigate = useNavigate();
-  const [authenticated, setAuthenticated] = useState(
-    sessionStorage.getItem(AUTH_STORAGE_KEY) === "true"
-  );
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [authResetting, setAuthResetting] = useState(false);
   const [authUsername, setAuthUsername] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState(false);
+  const [authErrorMessage, setAuthErrorMessage] = useState("Invalid email or password");
+  const [authInfoMessage, setAuthInfoMessage] = useState("");
 
   const [vars, setVars] = useState(loadVars);
   const [editVars, setEditVars] = useState(loadVars);
@@ -38,6 +42,15 @@ export default function App() {
     global: false,
   });
   const [quoteResult, setQuoteResult] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = subscribeAuthState((user) => {
+      setAuthenticated(Boolean(user));
+      setAuthLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (authenticated) {
@@ -77,24 +90,52 @@ export default function App() {
     };
   }, []);
 
-  function handleAuthSubmit(event) {
+  async function handleAuthSubmit(event) {
     event.preventDefault();
+    setAuthSubmitting(true);
+    setAuthError(false);
+    setAuthInfoMessage("");
 
-    if (authUsername.trim() === AUTH_USERNAME && authPassword === AUTH_PASSWORD) {
-      sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
-      setAuthenticated(true);
-      setAuthError(false);
+    const result = await loginWithFirebase(authUsername.trim(), authPassword);
+    if (result.ok) {
       setAuthPassword("");
+      setAuthSubmitting(false);
       return;
     }
 
     setAuthError(true);
+    setAuthErrorMessage(getAuthErrorMessage(result.code));
     setAuthPassword("");
+    setAuthSubmitting(false);
   }
 
-  function logout() {
-    sessionStorage.removeItem(AUTH_STORAGE_KEY);
-    setAuthenticated(false);
+  async function handleForgotPassword() {
+    const email = authUsername.trim();
+    if (!email) {
+      setAuthError(true);
+      setAuthInfoMessage("");
+      setAuthErrorMessage("Enter your email first, then tap Forgot password.");
+      return;
+    }
+
+    setAuthResetting(true);
+    setAuthError(false);
+    setAuthInfoMessage("");
+
+    const result = await sendResetEmail(email);
+    if (result.ok) {
+      setAuthInfoMessage("Password reset email sent. Check your inbox and spam folder.");
+      setAuthResetting(false);
+      return;
+    }
+
+    setAuthError(true);
+    setAuthErrorMessage(getResetErrorMessage(result.code));
+    setAuthResetting(false);
+  }
+
+  async function logout() {
+    await logoutFromFirebase();
     setAuthUsername("");
     setAuthPassword("");
     setAuthError(false);
@@ -186,9 +227,15 @@ export default function App() {
         authUsername={authUsername}
         authPassword={authPassword}
         authError={authError}
+        authErrorMessage={authErrorMessage}
+        authInfoMessage={authInfoMessage}
+        authLoading={authLoading}
+        authSubmitting={authSubmitting}
+        authResetting={authResetting}
         onUsernameChange={(event) => setAuthUsername(event.target.value)}
         onPasswordChange={(event) => setAuthPassword(event.target.value)}
         onSubmit={handleAuthSubmit}
+        onForgotPassword={handleForgotPassword}
       />
 
       <div className="app-shell">
@@ -233,4 +280,36 @@ export default function App() {
       </div>
     </>
   );
+}
+
+function getAuthErrorMessage(code) {
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+      return "Invalid email or password.";
+    case "auth/invalid-email":
+      return "That email format looks invalid.";
+    case "auth/too-many-requests":
+      return "Too many attempts. Wait a few minutes or use Forgot password.";
+    case "auth/not-configured":
+      return "Authentication is not configured for this environment.";
+    default:
+      return "Sign-in failed. Please try again.";
+  }
+}
+
+function getResetErrorMessage(code) {
+  switch (code) {
+    case "auth/invalid-email":
+      return "Enter a valid email address to reset your password.";
+    case "auth/user-not-found":
+      return "No account found with that email.";
+    case "auth/too-many-requests":
+      return "Too many reset requests. Wait a few minutes and try again.";
+    case "auth/not-configured":
+      return "Password reset is not configured for this environment.";
+    default:
+      return "Could not send reset email. Please try again.";
+  }
 }
