@@ -9,7 +9,9 @@ const NAV_ITEMS = [
 export default function Toolbar({ onLogout }) {
   return (
     <header className="toolbar">
-      <span className="toolbar-title">Quote App</span>
+      <NavLink className="toolbar-title toolbar-title-link" to="/" end>
+        Quote App
+      </NavLink>
       <nav>
         {NAV_ITEMS.map((item) => (
           <NavLink
