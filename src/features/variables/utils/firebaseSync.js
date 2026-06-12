@@ -8,8 +8,8 @@ import {
 import { getFirebaseApp } from "../../../shared/utils/firebaseApp";
 import { normalizeVars } from "./variables";
 
-const varsCollection = import.meta.env.VITE_FIREBASE_VARS_COLLECTION || "quoteApp";
-const varsDocId = import.meta.env.VITE_FIREBASE_VARS_DOC_ID || "sharedVariables";
+const varsCollection = import.meta.env.VITE_FIREBASE_VARS_COLLECTION || "Quote_App";
+const varsDocId = import.meta.env.VITE_FIREBASE_VARS_DOC_ID || "Shared_Variables";
 
 function getDb() {
   const app = getFirebaseApp();
@@ -42,7 +42,7 @@ export async function loadSyncedVars() {
 export async function saveSyncedVars(vars) {
   const db = getDb();
   if (!db) {
-    return false;
+    return { ok: false, code: "sync/not-configured" };
   }
 
   try {
@@ -56,8 +56,8 @@ export async function saveSyncedVars(vars) {
       { merge: true }
     );
 
-    return true;
-  } catch {
-    return false;
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, code: error?.code || "sync/unknown" };
   }
 }

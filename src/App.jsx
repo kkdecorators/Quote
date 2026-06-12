@@ -207,11 +207,11 @@ export default function App() {
     setEditVars(normalized);
     saveVars(normalized);
 
-    const synced = await saveSyncedVars(normalized);
-    if (synced) {
+    const syncResult = await saveSyncedVars(normalized);
+    if (syncResult.ok) {
       window.alert("Variables updated successfully");
     } else {
-      window.alert("Variables updated locally. Firebase sync is unavailable.");
+      window.alert(`Variables updated locally. ${getSyncErrorMessage(syncResult.code)}`);
     }
 
     navigate("/");
@@ -311,5 +311,18 @@ function getResetErrorMessage(code) {
       return "Password reset is not configured for this environment.";
     default:
       return "Could not send reset email. Please try again.";
+  }
+}
+
+function getSyncErrorMessage(code) {
+  switch (code) {
+    case "permission-denied":
+      return "Firebase denied access. Check Firestore rules for Quote_App/Shared_Variables.";
+    case "unauthenticated":
+      return "You are not authenticated with Firebase. Log in again and retry.";
+    case "sync/not-configured":
+      return "Firebase sync is not configured in this deployed environment.";
+    default:
+      return "Firebase sync is unavailable right now.";
   }
 }
