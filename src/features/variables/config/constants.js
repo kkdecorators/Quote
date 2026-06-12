@@ -10,7 +10,7 @@ export const LABELS = {
   I: "Brackets",
   J: "Sliding Lock",
   K: "Nuts and Accessories",
-  L: "Shipping and Warehouse",
+  L: "Shipping & Warehouse",
   M: "Margin",
 };
 
