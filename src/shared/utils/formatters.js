@@ -1,8 +1,11 @@
 export function fmtNZD(value) {
-  return value.toLocaleString("en-NZ", {
+  const roundedUp = Math.ceil(Number(value) || 0);
+
+  return roundedUp.toLocaleString("en-NZ", {
     style: "currency",
     currency: "NZD",
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }
 

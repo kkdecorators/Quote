@@ -92,16 +92,16 @@ export default function QuoteSection({
               <div className="results-col-title">Cost</div>
               <div className="result-row">
                 <span className="result-label">Ex. GST</span>
-                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.costEx) : "$0.00"}</span>
+                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.costEx) : fmtNZD(0)}</span>
               </div>
               <div className="result-row">
                 <span className="result-label">GST</span>
-                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.costGST) : "$0.00"}</span>
+                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.costGST) : fmtNZD(0)}</span>
               </div>
               <div className="result-row result-row--total">
                 <span className="result-label">Inc. GST</span>
                 <span className="result-value result-value--total">
-                  {quoteResult ? fmtNZD(quoteResult.costInc) : "$0.00"}
+                  {quoteResult ? fmtNZD(quoteResult.costInc) : fmtNZD(0)}
                 </span>
               </div>
             </div>
@@ -112,16 +112,16 @@ export default function QuoteSection({
               <div className="results-col-title">Margin</div>
               <div className="result-row">
                 <span className="result-label">Ex. GST</span>
-                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.sellEx) : "$0.00"}</span>
+                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.sellEx) : fmtNZD(0)}</span>
               </div>
               <div className="result-row">
                 <span className="result-label">GST</span>
-                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.sellGST) : "$0.00"}</span>
+                <span className="result-value">{quoteResult ? fmtNZD(quoteResult.sellGST) : fmtNZD(0)}</span>
               </div>
               <div className="result-row result-row--total">
                 <span className="result-label">Inc. GST</span>
                 <span className="result-value result-value--total">
-                  {quoteResult ? fmtNZD(quoteResult.sellInc) : "$0.00"}
+                  {quoteResult ? fmtNZD(quoteResult.sellInc) : fmtNZD(0)}
                 </span>
               </div>
             </div>
