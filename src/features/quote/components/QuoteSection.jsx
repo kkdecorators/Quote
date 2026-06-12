@@ -1,7 +1,6 @@
 import { fmtNZD } from "../../../shared/utils/formatters";
 
 export default function QuoteSection({
-  sectionRef,
   meters,
   quantity,
   quoteErrors,
@@ -12,8 +11,12 @@ export default function QuoteSection({
   onClear,
   onCalculate,
 }) {
+  const totalEx = quoteResult ? quoteResult.costEx + quoteResult.sellEx : 0;
+  const totalGST = quoteResult ? quoteResult.costGST + quoteResult.sellGST : 0;
+  const totalInc = quoteResult ? quoteResult.costInc + quoteResult.sellInc : 0;
+
   return (
-    <section id="quote" className="page-section section-gap" ref={sectionRef}>
+    <section id="quote" className="page-section">
       <div className="page-content">
         <h2 className="section-heading">Get a Quote</h2>
         <form autoComplete="off" onSubmit={onCalculate}>
@@ -120,6 +123,24 @@ export default function QuoteSection({
                 <span className="result-value result-value--total">
                   {quoteResult ? fmtNZD(quoteResult.sellInc) : "$0.00"}
                 </span>
+              </div>
+            </div>
+
+            <div className="results-divider"></div>
+
+            <div>
+              <div className="results-col-title">Total</div>
+              <div className="result-row">
+                <span className="result-label">Ex. GST</span>
+                <span className="result-value">{fmtNZD(totalEx)}</span>
+              </div>
+              <div className="result-row">
+                <span className="result-label">GST</span>
+                <span className="result-value">{fmtNZD(totalGST)}</span>
+              </div>
+              <div className="result-row result-row--total">
+                <span className="result-label">Inc. GST</span>
+                <span className="result-value result-value--total">{fmtNZD(totalInc)}</span>
               </div>
             </div>
           </div>

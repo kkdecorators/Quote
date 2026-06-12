@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import AuthGate from "./features/auth/components/AuthGate";
 import HomeSection from "./features/home/components/HomeSection";
 import Toolbar from "./features/layout/components/Toolbar";
 import QuoteSection from "./features/quote/components/QuoteSection";
 import { computeQuote } from "./features/quote/utils/quote";
-import EditVarsSection from "./features/variables/components/EditVarsSection";
 import VarsSection from "./features/variables/components/VarsSection";
 import {
   AUTH_PASSWORD,
@@ -15,6 +15,7 @@ import { loadVars, saveVars } from "./features/variables/utils/storage";
 import { normalizeVars } from "./features/variables/utils/variables";
 
 export default function App() {
+  const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(
     sessionStorage.getItem(AUTH_STORAGE_KEY) === "true"
   );
@@ -33,21 +34,10 @@ export default function App() {
     global: false,
   });
   const [quoteResult, setQuoteResult] = useState(null);
-  const [activeSection, setActiveSection] = useState("home");
-
-  const refs = {
-    home: useRef(null),
-    quote: useRef(null),
-    vars: useRef(null),
-    edit: useRef(null),
-  };
 
   useEffect(() => {
     if (authenticated) {
       document.body.classList.remove("auth-locked");
-      requestAnimationFrame(() => {
-        scrollToSection("home", false);
-      });
     } else {
       document.body.classList.add("auth-locked");
     }
@@ -56,24 +46,6 @@ export default function App() {
       document.body.classList.remove("auth-locked");
     };
   }, [authenticated]);
-
-  function scrollToSection(sectionId, smooth = true) {
-    const node = refs[sectionId]?.current;
-
-    if (!node) {
-      return;
-    }
-
-    node.scrollIntoView({
-      behavior: smooth ? "smooth" : "auto",
-      block: "start",
-    });
-    setActiveSection(sectionId);
-
-    if (sectionId === "edit") {
-      setEditVars(normalizeVars(vars));
-    }
-  }
 
   function handleAuthSubmit(event) {
     event.preventDefault();
@@ -96,7 +68,7 @@ export default function App() {
     setAuthUsername("");
     setAuthPassword("");
     setAuthError(false);
-    setActiveSection("home");
+    navigate("/");
   }
 
   function stepQuoteField(field, delta) {
@@ -161,13 +133,14 @@ export default function App() {
     event.preventDefault();
     const normalized = normalizeVars(editVars);
     setVars(normalized);
+    setEditVars(normalized);
     saveVars(normalized);
-    scrollToSection("vars");
+    window.alert("Variables updated successfully");
+    navigate("/");
   }
 
   function cancelEdit() {
     setEditVars(normalizeVars(vars));
-    scrollToSection("vars");
   }
 
   return (
@@ -182,39 +155,41 @@ export default function App() {
       />
 
       <div className="app-shell">
-        <Toolbar
-          activeSection={activeSection}
-          onScrollToSection={scrollToSection}
-          onLogout={logout}
-        />
+        <Toolbar onLogout={logout} />
 
-        <main className="page-host single-page-layout">
-          <HomeSection sectionRef={refs.home} onScrollToSection={scrollToSection} />
-          <QuoteSection
-            sectionRef={refs.quote}
-            meters={meters}
-            quantity={quantity}
-            quoteErrors={quoteErrors}
-            quoteResult={quoteResult}
-            onMetersChange={(event) => setMeters(event.target.value)}
-            onQuantityChange={(event) => setQuantity(event.target.value)}
-            onStepField={stepQuoteField}
-            onClear={clearQuote}
-            onCalculate={calculateQuote}
-          />
-          <VarsSection
-            sectionRef={refs.vars}
-            vars={vars}
-            onEditClick={() => scrollToSection("edit")}
-          />
-          <EditVarsSection
-            sectionRef={refs.edit}
-            editVars={editVars}
-            onStepField={stepEditField}
-            onInputChange={updateEditField}
-            onSave={saveEditVars}
-            onCancel={cancelEdit}
-          />
+        <main className="page-host">
+          <Routes>
+            <Route path="/" element={<HomeSection onNavigate={navigate} />} />
+            <Route
+              path="/quote"
+              element={
+                <QuoteSection
+                  meters={meters}
+                  quantity={quantity}
+                  quoteErrors={quoteErrors}
+                  quoteResult={quoteResult}
+                  onMetersChange={(event) => setMeters(event.target.value)}
+                  onQuantityChange={(event) => setQuantity(event.target.value)}
+                  onStepField={stepQuoteField}
+                  onClear={clearQuote}
+                  onCalculate={calculateQuote}
+                />
+              }
+            />
+            <Route
+              path="/variables"
+              element={
+                <VarsSection
+                  editVars={editVars}
+                  onStepField={stepEditField}
+                  onInputChange={updateEditField}
+                  onSave={saveEditVars}
+                  onCancel={cancelEdit}
+                />
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
 
         <footer className="app-footer">&copy; 2026 Quote App</footer>

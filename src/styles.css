@@ -1,10 +1,6 @@
 /* --- Ensure sections are not hidden behind sticky header and have top margin --- */
 .page-section {
-  scroll-margin-top: var(--toolbar-h, 40px);
-  margin-top: 40px;
-}
-.page-section:first-child {
-  margin-top: 0;
+  padding: 24px 0;
 }
 @media (max-width: 600px) {
   :root {
@@ -22,13 +18,6 @@
     font-size: 12.5px;
     height: 28px;
     padding: 0 7px;
-  }
-  .page-section {
-    margin-top: 24px;
-    scroll-margin-top: var(--toolbar-h, 36px);
-  }
-  .page-section:first-child {
-    margin-top: 0;
   }
 }
 @media (max-width: 600px) {
@@ -107,21 +96,12 @@
     flex-direction: column;
     gap: 8px;
   }
-  .section-gap {
-    margin-top: 32px;
-  }
   .app-footer {
     font-size: 12px;
     height: 40px;
     padding: 0 4px;
   }
 }
-/* --- Section Gap for Single Page Layout --- */
-.section-gap {
-  margin-top: 500px;
-}
-.section-gap:first-child {
-  margin-top: 0;}
 /* ─── Reset & Base ─────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -310,6 +290,7 @@ body {
   font-size: 11.5px;
   font-weight: 500;
   padding: 0 7px;
+  text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
 @media (max-width: 600px) {
@@ -334,6 +315,11 @@ body {
 .icon-btn:hover {
   background: rgba(255,255,255,0.18);
   color: #e3f0ff;
+}
+
+.icon-btn.active {
+  background: rgba(255,255,255,0.24);
+  color: #ffffff;
 }
 
 /* ─── Drawer ────────────────────────────────────────────── */
@@ -736,7 +722,7 @@ body {
 
 .results-grid {
   display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  grid-template-columns: 1fr 1px 1fr 1px 1fr;
   gap: 0 20px;
 }
 
