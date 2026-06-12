@@ -52,7 +52,6 @@ export default function VarsSection({
                 <button type="button" className="edit-step-btn" onClick={() => onStepField(key, 1)}>
                   +
                 </button>
-                <span className="edit-unit">{key === "M" ? "" : "$"}</span>
               </div>
             ))}
           </div>
